@@ -1,0 +1,12 @@
+targets:
+  $default:
+    builders:
+      graphql_codegen:
+        options:
+          clients:
+            - graphql
+            - graphql_flutter
+          namingSeparator: ""
+          scalars:
+            float8:
+              type: int

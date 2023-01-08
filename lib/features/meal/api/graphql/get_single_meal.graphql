@@ -1,0 +1,9 @@
+query SingleMeal($id: Int!) {
+  meal_roulette_app_meals_by_pk(id: $id) {
+    id
+    title
+    picture
+    description
+    ingredients
+  }
+}

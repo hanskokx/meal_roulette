@@ -1,0 +1,11 @@
+query MealsWithOffset($offset: Int) {
+  meal_roulette_app_meals_aggregate(limit: 4, offset: $offset) {
+    nodes {
+      id
+      title
+      picture
+      description
+      ingredients
+    }
+  }
+}
