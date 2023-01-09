@@ -24,6 +24,10 @@ import 'package:mockito/mockito.dart' as _i1;
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockMealDetailsApi extends _i1.Mock implements _i2.MealDetailsApi {
+  MockMealDetailsApi() {
+    _i1.throwOnMissingStub(this);
+  }
+
   @override
   _i3.Future<_i4.Meal?> getMeal({required int? id}) => (super.noSuchMethod(
         Invocation.method(
@@ -32,6 +36,5 @@ class MockMealDetailsApi extends _i1.Mock implements _i2.MealDetailsApi {
           {#id: id},
         ),
         returnValue: _i3.Future<_i4.Meal?>.value(),
-        returnValueForMissingStub: _i3.Future<_i4.Meal?>.value(),
       ) as _i3.Future<_i4.Meal?>);
 }

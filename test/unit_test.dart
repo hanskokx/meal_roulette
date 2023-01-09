@@ -1,46 +1,50 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:meal_roulette/common/classes/meal.dart';
+import 'package:meal_roulette/common/injector.dart';
 import 'package:meal_roulette/features/meal/api/meal_api.dart';
-import 'package:meal_roulette/features/meal/bloc/meal_bloc.dart';
 import 'package:meal_roulette/features/meal/screens/meal_details_screen.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'unit_test.mocks.dart';
 
-@GenerateMocks(
-  [],
-  customMocks: [
-    MockSpec<MealDetailsApi>(onMissingStub: OnMissingStub.returnDefault),
-  ],
-)
+@GenerateMocks([MealDetailsApi])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
   final MealDetailsApi api = MockMealDetailsApi();
-  const Meal meal = Meal(
-    id: 0,
-    title: "Test meal",
-    picture: "https://via.placeholder.com/150",
-    description: "Meal description",
-    ingredients: "1 scoop of Flutter, 1 dash of awesome",
-  );
 
-  const Meal partialMeal = Meal(
-    id: 1,
-    title: "Partial meal",
-  );
+  setUp(() async {
+    await injectorSetup(GetIt.I);
 
-  when(api.getMeal(id: 0)).thenAnswer((_) async => Future.value(meal));
-  when(api.getMeal(id: 1)).thenAnswer((_) async => Future.value(partialMeal));
-  when(api.getMeal(id: 2)).thenAnswer((_) async => Future.value(null));
+    await GetIt.I.unregister<MealDetailsApi>();
+    GetIt.I.registerLazySingleton<MealDetailsApi>(
+      () => api,
+    );
+
+    const Meal meal = Meal(
+      id: 0,
+      title: "Test meal",
+      picture: "https://via.placeholder.com/150",
+      description: "Meal description",
+      ingredients: "1 scoop of Flutter, 1 dash of awesome",
+    );
+
+    const Meal partialMeal = Meal(
+      id: 1,
+      title: "Partial meal",
+    );
+
+    when(api.getMeal(id: 0)).thenAnswer((_) async => Future.value(meal));
+    when(api.getMeal(id: 1)).thenAnswer((_) async => Future.value(partialMeal));
+    when(api.getMeal(id: 2)).thenAnswer((_) async => Future.value(null));
+  });
 
   testWidgets('Complete meals are displayed appropriately', (tester) async {
     await tester.pumpWidget(
-      MyWidget(api: api, id: '0'),
+      MyWidget(id: '0', api: api),
     );
 
     await tester.pumpAndSettle();
@@ -59,7 +63,7 @@ void main() {
 
   testWidgets('Partial meals are displayed appropriately', (tester) async {
     await tester.pumpWidget(
-      MyWidget(api: api, id: '1'),
+      MyWidget(id: '1', api: api),
     );
 
     await tester.pumpAndSettle();
@@ -79,7 +83,7 @@ void main() {
 
   testWidgets('Null meals are displayed appropriately', (tester) async {
     await tester.pumpWidget(
-      MyWidget(api: api, id: '2'),
+      MyWidget(id: '2', api: api),
     );
 
     await tester.pumpAndSettle();
@@ -91,20 +95,19 @@ void main() {
 }
 
 class MyWidget extends StatelessWidget {
-  final MealDetailsApi api;
   final String? id;
+  final MealDetailsApi api;
 
   const MyWidget({
-    required this.api,
     this.id,
+    required this.api,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => MealBloc(api),
-      child: MaterialApp(home: MealDetailsScreen(id: id)),
+    return MaterialApp(
+      home: MealDetailsScreen(id: id),
     );
   }
 }
